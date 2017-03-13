@@ -5,10 +5,16 @@ RSpec.describe TasksController, type: :controller do
     it "should list the tasks in the database" do
       task1 = FactoryGirl.create(:task)
       task2 = FactoryGirl.create(:task)
+      task1.update_attributes(title: "Something else")
       get :index
       expect(response).to have_http_status :success
       response_value = ActiveSupport::JSON.decode(@response.body) # Access the actual response from the app in @response. This should produce a string of text that is in the JSON format.
       expect(response_value.count).to eq(2)
+      response_ids = []
+      response_value.each do |task|
+        response_ids << task["id"]
+      end
+      expect(response_ids).to eq([task1.id, task2.id])
     end
   end
 
